@@ -1,42 +1,4 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<windows.h>
-#include "sqlite3.h"
-
-//#include<unistd.h> for linux
-
-/*typedef struct account
-{
-    char user_name[20];
-    char pass_word[20];
-    char remark[50];
-}NODE;
-*/
-void exec_sql(const char *sql,boolean is_query);
-int call_back(void *para ,int n_col,char **col_value,char **col_name);
-void save_pass_word();
-void get_pass_word();
-void update_pass_word();
-char* code_user_name(char *);       /*加密用户名*/
-char* code_pass_word(char *);       /*加密密码*/
-char* decode_pass_word(char *);     /*解密密码*/
-void user_face();
-void deal_chioce();
-void print_all();
-//int count = 0;
-//NODE acct_node[100];
-
-int main()
-{
-    user_face();
-
-    while(1)
-    {
-        deal_chioce();
-    }
-
-    return 0;
-}
+#include "passWordManager.h"
 
 void deal_chioce()
 {
@@ -64,57 +26,11 @@ void deal_chioce()
     }
 }
 
-void exec_sql(const char *sql,boolean is_query)
-{
-    sqlite3 *db = NULL;
-    char *errmsg;
-    int result = sqlite3_open("data/test.db",&db);
-    if(result != SQLITE_OK)
-    {
-        printf("Open failed!\n");
-        return ;
-    }
-
-    if(is_query)
-    {
-        result = sqlite3_exec(db,sql,call_back,0,&errmsg);
-    }
-    else
-    {
-        result = sqlite3_exec(db,sql,0,0,&errmsg);
-    }
-
-    //printf("%d %s\n",result,errmsg);
-
-    if(result != SQLITE_OK)
-    {
-        sqlite3_close(db);
-        printf("错误代码：%d,错误信息：%s\n",result,errmsg);
-        sqlite3_free(errmsg);
-        return ;
-    }
-    sqlite3_close(db);
-}
-
-//每查到一条记录调用一次该函数
-int call_back(void *para ,int n_col,char **col_value,char **col_name)
-{
-    int i;
-    printf("共%d个字段\n",n_col);
-    printf("字段名 : 字段值\n");
-    for(i=0;i<n_col;i++)
-    {
-        //decode_pass_word();
-        printf("%s : %s\n",col_name[i],col_value[i]);
-    }
-    return 0;
-}
-
 void save_pass_word()
 {
-    char insert_sql[10240];
-    char user_name[20];
-    char pass_word[20];
+    char insert_sql[SQL_LENGTH];
+    char user_name[USER_SIZE];
+    char pass_word[USER_SIZE];
     char remark[50];
     boolean is_query = FALSE;
 
@@ -139,18 +55,18 @@ void save_pass_word()
     exec_sql(insert_sql,is_query);
 
     printf("Save successful!\n");
-    Sleep(2000);
-    system("cls");
-    user_face();
+    Sleep(SLEEP_TIME);
+    //system("cls");
+    //user_face();
 }
 
 void get_pass_word()
 {
     //printf("Here you can find your password which you've forget!\n");
-    char name[20];
-    char query_sql[10240];
+    char name[USER_SIZE];
+    char query_sql[SQL_LENGTH];
     boolean is_query = TRUE;
-
+    printf("Input your username:\n");
     gets(name);
     //code_user_name(name);
 
@@ -158,34 +74,47 @@ void get_pass_word()
     exec_sql(query_sql,is_query);
     //printf("%s\n",query_sql);
 
-    Sleep(6000);
-    system("cls");
-    user_face();
+    Sleep(SLEEP_TIME);
+    //system("cls");
+    //user_face();
 }
 
 void update_pass_word()
 {
-    char update_sql[10240];
-    char user_name[20];
-    char pass_word[20];
+    char update_sql[SQL_LENGTH];
+    char user_name[USER_SIZE];
+    char platform[USER_SIZE];
+    char pass_word[USER_SIZE];
+    char pass_word1[USER_SIZE];
     boolean is_query = FALSE;
 
     printf("user_name: ");
     gets(user_name);
+    printf("platform: ");
+    gets(platform);
     //code_user_name(user_name);
     printf("New password: ");
     gets(pass_word);
+    printf("New password again: ");
+    gets(pass_word1);
     //code_pass_word(pass_word);
+    if(strcmp(pass_word,pass_word1) != 0)
+    {
+        printf("Not match!\n");
+        Sleep(SLEEP_TIME);
+        system("cls");
+        return ;
+    }
 
-    sprintf(update_sql,"update account_info set pass_word = '%s' where user_name = '%s' ",pass_word,user_name);
+    sprintf(update_sql,"update account_info set pass_word = '%s' where user_name = '%s' and platform = '%s' ",pass_word,user_name,platform);
     //printf("%s\n",update_sql);
 
     exec_sql(update_sql,is_query);
 
     printf("Update successful!\n");
-    Sleep(3000);
-    system("cls");
-    user_face();
+    Sleep(SLEEP_TIME);
+    //system("cls");
+    //user_face();
 }
 
 void user_face()

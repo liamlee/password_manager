@@ -1,14 +1,14 @@
 #include "db_client.h"
 
-void exec_sql(const char *sql,boolean is_query)
+int exec_sql(const char *sql,boolean is_query)
 {
     sqlite3 *db = NULL;
     char *errmsg;
-    int result = sqlite3_open("data/test.db",&db);
+    int result = sqlite3_open("data/account_info.db",&db);
     if(result != SQLITE_OK)
     {
         printf("Open failed!\n");
-        return ;
+        return 1;
     }
 
     if(is_query)
@@ -27,9 +27,10 @@ void exec_sql(const char *sql,boolean is_query)
         sqlite3_close(db);
         printf("错误代码：%d,错误信息：%s\n",result,errmsg);
         sqlite3_free(errmsg);
-        return ;
+        return 1;
     }
     sqlite3_close(db);
+    return 0;
 }
 
 //每查到一条记录调用一次该函数
@@ -37,7 +38,7 @@ int call_back(void *para ,int n_col,char **col_value,char **col_name)
 {
     int i;
     //printf("共%d个字段\n",n_col);
-    printf("字段名 : 字段值\n");
+    //printf("字段名 : 字段值\n");
     for(i=0;i<n_col;i++)
     {
         //decode_pass_word();

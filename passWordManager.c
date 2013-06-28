@@ -17,6 +17,9 @@ void deal_chioce()
         case '3':
             update_pass_word();
             break;
+        case '4':
+            remove_account();
+            break;
         case '0':
             exit(0);
         default:
@@ -31,33 +34,40 @@ void save_pass_word()
     char insert_sql[SQL_LENGTH];
     char user_name[USER_SIZE];
     char pass_word[USER_SIZE];
+    char platform[USER_SIZE];
     char remark[50];
+    int result;
     boolean is_query = FALSE;
 
-    printf("Input your username:\n");
+    printf("Input your username:\n>");
     gets(user_name);
     //code_user_name(user_name);
 
-    printf("Input your password:\n");
+    printf("Input your password:\n>");
     gets(pass_word);
     //code_pass_word(pass_word);
+    printf("Input the platform for this account:\n>");
+    gets(platform);
 
-    printf("Remark the account!:\n");
+    printf("Remark the account!:\n>");
     gets(remark);
 
     /*printf("username %s ",user_name);
     printf("password %s ",pass_word);
     printf("Remark %s\n ",remark);*/
 
-    sprintf(insert_sql,"insert into account_info values('%s','%s','%s')",user_name,pass_word,remark);
+    sprintf(insert_sql,"insert into account_info values('%s','%s','%s','%s')",user_name,pass_word,platform,remark);
     //printf("%s\n",insert_sql);
 
-    exec_sql(insert_sql,is_query);
+    result = exec_sql(insert_sql,is_query);
+    if(result)
+    {
+        Sleep(SLEEP_TIME);
+        return ;
+    }
 
     printf("Save successful!\n");
     Sleep(SLEEP_TIME);
-    //system("cls");
-    //user_face();
 }
 
 void get_pass_word()
@@ -65,8 +75,9 @@ void get_pass_word()
     //printf("Here you can find your password which you've forget!\n");
     char name[USER_SIZE];
     char query_sql[SQL_LENGTH];
+
     boolean is_query = TRUE;
-    printf("Input your username:\n");
+    printf("Input your username:\n>");
     gets(name);
     //code_user_name(name);
 
@@ -75,8 +86,6 @@ void get_pass_word()
     //printf("%s\n",query_sql);
 
     Sleep(SLEEP_TIME);
-    //system("cls");
-    //user_face();
 }
 
 void update_pass_word()
@@ -86,16 +95,17 @@ void update_pass_word()
     char platform[USER_SIZE];
     char pass_word[USER_SIZE];
     char pass_word1[USER_SIZE];
+    int result ;
     boolean is_query = FALSE;
 
-    printf("user_name: ");
+    printf("user_name:\n>");
     gets(user_name);
-    printf("platform: ");
+    printf("platform:\n>");
     gets(platform);
     //code_user_name(user_name);
-    printf("New password: ");
+    printf("New password:\n>");
     gets(pass_word);
-    printf("New password again: ");
+    printf("New password again:\n>");
     gets(pass_word1);
     //code_pass_word(pass_word);
     if(strcmp(pass_word,pass_word1) != 0)
@@ -109,12 +119,54 @@ void update_pass_word()
     sprintf(update_sql,"update account_info set pass_word = '%s' where user_name = '%s' and platform = '%s' ",pass_word,user_name,platform);
     //printf("%s\n",update_sql);
 
-    exec_sql(update_sql,is_query);
+    result = exec_sql(update_sql,is_query);
+    if(result)
+    {
+        Sleep(SLEEP_TIME);
+        return ;
+    }
 
     printf("Update successful!\n");
     Sleep(SLEEP_TIME);
-    //system("cls");
-    //user_face();
+}
+
+void remove_account()
+{
+    char delete_sql[SQL_LENGTH];
+    char user_name[USER_SIZE];
+    char Y_N;
+    char platform[USER_SIZE];
+
+    int result ;
+    boolean is_query = FALSE;
+
+    printf("user_name:\n>");
+    gets(user_name);
+    printf("platform:\n>");
+    gets(platform);
+
+    printf("Are you sure to remove this account? (Y/N)\n>");
+    scanf("%c",&Y_N);
+    getchar();
+    if('Y' != Y_N)
+    {
+        printf("Your have cancel this remove action!");
+        Sleep(SLEEP_TIME);
+        return ;
+    }
+
+    sprintf(delete_sql,"delete from  account_info where user_name = '%s' and platform = '%s' ",user_name,platform);
+
+    result = exec_sql(delete_sql,is_query);
+    if(result)
+    {
+        Sleep(SLEEP_TIME);
+        return ;
+    }
+
+    printf("Delete successful!\n");
+    Sleep(SLEEP_TIME);
+
 }
 
 void user_face()
@@ -123,13 +175,15 @@ void user_face()
     printf("----------------------------------------------------\n");
     printf("\t    welcome to password manager!\n");
     printf("\n");
-    printf("Make your chioce:(0~2):\n");
-    printf("1 :\tSave Your Password!\n");
-    printf("2 :\tFind Your Password!\n");
-    printf("3 :\tUpdate Your Password\n");
-    printf("0 :\tGood-Bye!\n");
+    printf("\t1 :\tSave Your Password!\n");
+    printf("\t2 :\tFind Your Password!\n");
+    printf("\t3 :\tUpdate Your Password!\n");
+    printf("\t4 :\tRemove Your Account!\n");
+    printf("\t0 :\tGood-Bye!\n");
     printf("\n");
     printf("----------------------------------------------------\n");
+    printf("Make your chioce:(0~4):\n");
+    printf(">");
 }
 
 void print_all()

@@ -14,6 +14,9 @@ void get_pass_word();
 //根据用户名、账号所在平台，更新密码
 void update_pass_word();
 
+//删除账号
+void remove_account();
+
 //用户操作提示界面
 void user_face();
 
